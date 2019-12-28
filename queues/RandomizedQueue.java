@@ -6,116 +6,66 @@
 
 import edu.princeton.cs.algs4.StdRandom;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class RandomizedQueue<Item> implements Iterable<Item> {
+    private final ArrayList<Item> myQueue = new ArrayList<>();
 
-    private int queueDepth = 0;
-
-    private class MyQueue {
-        private Item currentNode;
-        private MyQueue next;
-        private MyQueue prev;
-    }
-
-    private MyQueue head = null;
-    private MyQueue tail = null;
-
-    // construct an empty randomized queue
+    // Empty constructor
     public RandomizedQueue() {
-
     }
 
-    // is the randomized queue empty?
     public boolean isEmpty() {
-        return queueDepth == 0;
+        return myQueue.isEmpty();
     }
 
-    // return the number of items on the randomized queue
     public int size() {
-        return queueDepth;
+        return myQueue.size();
     }
 
-    // returns nth item in a queue
-    private MyQueue getN(int n) {
-        MyQueue temp = head;
-        for (int i = 0; i < n; i++) {
-            temp = temp.next;
-        }
-        return temp;
-    }
-
-    // add the item
     public void enqueue(Item item) {
         if (item == null) {
-            throw new IllegalArgumentException("Null value not accepted");
+            throw new IllegalArgumentException("null argument not accepted");
         }
-        MyQueue temp = new MyQueue();
-        temp.currentNode = item;
-        if (head == null && tail == null) {
-            head = temp;
-            tail = temp;
-        }
-        else {
-            tail.next = temp;
-            temp.prev = tail;
-            tail = temp;
-        }
-        queueDepth++;
+        myQueue.add(item);
     }
 
-    // remove and return a random item
     public Item dequeue() {
-        if (queueDepth == 0) {
-            throw new NoSuchElementException("The queue is empty");
+        if (myQueue.isEmpty()) {
+            throw new NoSuchElementException("queue is empty");
         }
-        MyQueue temp = getN(StdRandom.uniform(queueDepth));
-        if (temp.prev == null && temp.next == null) {
-            head = null;
-            tail = null;
-        }
-        else if (temp.prev == null) {
-            head = temp.next;
-            temp.next.prev = null;
-        }
-        else if (temp.next == null) {
-            tail = temp.prev;
-            temp.prev.next = null;
-        }
-        else {
-            temp.next.prev = temp.prev;
-            temp.prev.next = temp.next;
-        }
-        queueDepth--;
-        return temp.currentNode;
+        return myQueue.remove(StdRandom.uniform(myQueue.size()));
     }
 
-    // return a random item (but do not remove it)
     public Item sample() {
-        if (queueDepth == 0) {
-            throw new NoSuchElementException("The queue is empty");
+        if (myQueue.isEmpty()) {
+            throw new NoSuchElementException("queue is empty");
         }
-        return getN(StdRandom.uniform(queueDepth)).currentNode;
+        return myQueue.get(StdRandom.uniform(myQueue.size()));
     }
 
-    // return an independent iterator over items in random order
+    public static void main(String[] args) {
+        // Intentionally left blank;
+    }
+
     public Iterator<Item> iterator() {
-        return new RandQueueIter();
+        return new MyIterator();
     }
 
-    private class RandQueueIter implements Iterator<Item> {
+    private class MyIterator implements Iterator<Item> {
 
         private final int[] randSeq;
         private int currentIndex = 0;
 
-        public RandQueueIter() {
-            randSeq = StdRandom.permutation(queueDepth);
+        public MyIterator() {
+            randSeq = StdRandom.permutation(myQueue.size());
         }
 
         @Override
         public void remove() {
-            throw new UnsupportedOperationException();
+            throw new UnsupportedOperationException("This method is not supported");
         }
 
         @Override
@@ -131,16 +81,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
             if (currentIndex == randSeq.length) {
                 throw new NoSuchElementException("The iterator has reached the end");
             }
-            MyQueue temp = head;
-            for (int i = 0; i < randSeq[currentIndex]; i++) {
-                temp = temp.next;
-            }
-            currentIndex++;
-            return temp.currentNode;
+            return myQueue.get(randSeq[currentIndex++]);
         }
-    }
-
-    public static void main(String[] args) {
-        // Intentionally left empty
     }
 }
