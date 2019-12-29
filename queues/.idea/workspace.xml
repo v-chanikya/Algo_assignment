@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="c1e4f978-b3bd-4ae1-84e9-9e1170bce808" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/../percolation/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../percolation/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="c1e4f978-b3bd-4ae1-84e9-9e1170bce808" name="Default" comment="Modified Permutations to use Randamozided queues&#10;&#10;This results in O(N) operation for printing k strings randomly. which previously used O(N2) with Deque&#10;Added dummy files for the last time">
+      <change afterPath="$PROJECT_DIR$/../percolation/AnalysisOfAlgorithms.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../percolation/UnionFind.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ElementarySorts.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/StacksAndQueues.pdf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Permutation.java" beforeDir="false" afterPath="$PROJECT_DIR$/Permutation.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -103,5 +105,9 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Modified Permutations to use Randamozided queues&#10;&#10;This results in O(N) operation for printing k strings randomly. which previously used O(N2) with Deque&#10;Added dummy files for the last time" />
+    <option name="LAST_COMMIT_MESSAGE" value="Modified Permutations to use Randamozided queues&#10;&#10;This results in O(N) operation for printing k strings randomly. which previously used O(N2) with Deque&#10;Added dummy files for the last time" />
   </component>
 </project>
