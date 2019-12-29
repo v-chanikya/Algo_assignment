@@ -6,7 +6,6 @@
 
 
 import edu.princeton.cs.algs4.StdIn;
-import edu.princeton.cs.algs4.StdRandom;
 
 import java.util.Iterator;
 
@@ -17,20 +16,16 @@ public class Permutation {
         }
         int k = Integer.parseInt(args[0]);
 
-        Deque<String> myque = new Deque<>();
+        RandomizedQueue<String> myque = new RandomizedQueue<>();
         while (!StdIn.isEmpty()) {
-            myque.addLast(StdIn.readString());
+            myque.enqueue(StdIn.readString());
         }
 
+        Iterator<String> iter = myque.iterator();
         for (int i = 0; i < k; i++) {
-            Iterator<String> iter = myque.iterator();
-            int rand = StdRandom.uniform(myque.size());
-            for (int j = 1; j < rand; j++) {
-                if (iter.hasNext()) {
-                    iter.next();
-                }
+            if (iter.hasNext()) {
+                System.out.println(iter.next());
             }
-            System.out.println(iter.next());
         }
     }
 }
