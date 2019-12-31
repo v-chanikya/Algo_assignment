@@ -13,6 +13,18 @@ public class BruteCollinearPoints {
         if (points == null) {
             throw new IllegalArgumentException("Input is invalid");
         }
+        if (points.length < 7) {
+            for (int i = 0; i < points.length; i++) {
+                if (points[i] == null) {
+                    throw new IllegalArgumentException("Input is invalid");
+                }
+                for (int k = i + 1; k < points.length; k++) {
+                    if (points[i].slopeTo(points[k]) == Double.NEGATIVE_INFINITY) {
+                        throw new IllegalArgumentException("buplicate entries");
+                    }
+                }
+            }
+        }
         lineSegments = new LineSegment[2];
         Point[] lowPoints = new Point[2];
         for (int i = 0; i < points.length - 3; i++) {
@@ -92,7 +104,7 @@ public class BruteCollinearPoints {
                 }
             }
         }
-        System.out.println(noOfLineSegments);
+        // System.out.println(noOfLineSegments);
     }
 
     public int numberOfSegments() {
