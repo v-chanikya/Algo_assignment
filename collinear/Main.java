@@ -22,15 +22,18 @@ public class Main {
 
         // draw the points
         StdDraw.enableDoubleBuffering();
+        StdDraw.setPenRadius(0.005);
         StdDraw.setXscale(0, 32768);
         StdDraw.setYscale(0, 32768);
         for (Point p : points) {
             p.draw();
         }
         StdDraw.show();
+        StdDraw.setPenRadius(0.001);
 
         // print and draw the line segments
-        BruteCollinearPoints collinear = new BruteCollinearPoints(points);
+        // BruteCollinearPoints collinear = new BruteCollinearPoints(points);
+        FastCollinearPoints collinear = new FastCollinearPoints(points);
         for (LineSegment segment : collinear.segments()) {
             StdOut.println(segment);
             segment.draw();
