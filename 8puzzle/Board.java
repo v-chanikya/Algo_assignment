@@ -161,8 +161,31 @@ public class Board {
         return new MyBoardIterable();
     }
 
+    private void swap(int[][] arr, int x1, int y1, int x2, int y2) {
+        int tmpval = arr[x1][y1];
+        arr[x1][y1] = arr[x2][y2];
+        arr[x2][y2] = tmpval;
+    }
+    // This is used to see if the board is solvable
     public Board twin() {
-        return null;
+        int[][] tempTiles = tiles.clone();
+        Board tmpBoard;
+        if (emptySlot == 0) {
+            swap(tempTiles, 0, 1, 1, 0);
+            tmpBoard = new Board(tempTiles);
+            swap(tempTiles, 1, 0, 0, 1);
+        }
+        else if (emptySlot == 1) {
+            swap(tempTiles, 0, 0, 1, 0);
+            tmpBoard = new Board(tempTiles);
+            swap(tempTiles, 1, 0, 0, 0);
+        }
+        else {
+            swap(tempTiles, 0, 0, 0, 1);
+            tmpBoard = new Board(tempTiles);
+            swap(tempTiles, 0, 1, 0, 0);
+        }
+        return tmpBoard;
     }
 
 
