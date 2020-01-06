@@ -5,22 +5,22 @@
  **************************************************************************** */
 
 import edu.princeton.cs.algs4.MinPQ;
+import edu.princeton.cs.algs4.Queue;
 
 import java.util.Comparator;
-import java.util.Iterator;
 
 public class Solver {
-    private static final HammingCompareBoards HAMMING_COMPARATOR = new HammingCompareBoards();
+    // private static final HammingCompareBoards HAMMING_COMPARATOR = new HammingCompareBoards();
     private static final ManhattanCompareBoards MANHATTAN_COMPARATOR = new ManhattanCompareBoards();
     private final boolean solvable;
-    private Board[] solutionBoards;
+    private final Queue<Board> solutionBoards = new Queue<>();
     private int moves = 0;
 
-    private static class HammingCompareBoards implements Comparator<Board> {
-        public int compare(Board o1, Board o2) {
-            return o1.hamming() - o2.hamming();
-        }
-    }
+    // private static class HammingCompareBoards implements Comparator<Board> {
+    //     public int compare(Board o1, Board o2) {
+    //         return o1.hamming() - o2.hamming();
+    //     }
+    // }
 
     private static class ManhattanCompareBoards implements Comparator<Board> {
         public int compare(Board o1, Board o2) {
@@ -32,35 +32,35 @@ public class Solver {
         if (initial == null) {
             throw new IllegalArgumentException("Initial board is illegl");
         }
-        solutionBoards = new Board[2];
         Board temp = initial;
-        solutionBoards[moves++] = temp;
+        Board[] prev2prev = new Board[2];
+        prev2prev[0] = initial;
+        solutionBoards.enqueue(temp);
+        moves++;
+
         Board ttemp = initial.twin();
         Board[] tsolutionsBoard = new Board[2];
         tsolutionsBoard[0] = ttemp;
-        while (!temp.isGoal() && !ttemp.isGoal() && moves < 10) {
+        while (!temp.isGoal() && !ttemp.isGoal()) {
             // Actual solution code
-            MinPQ<Board> pq = new MinPQ<>(HAMMING_COMPARATOR);
+            MinPQ<Board> pq = new MinPQ<>(MANHATTAN_COMPARATOR);
             for (Board iterBoard : temp.neighbors()) {
-                if (moves > 1 && !iterBoard.equals(solutionBoards[moves - 2])) {
+                if (moves > 1 && !iterBoard.equals(prev2prev[0])) {
                     pq.insert(iterBoard);
                 }
                 else if (moves == 1) {
                     pq.insert(iterBoard);
                 }
             }
-            if (moves == solutionBoards.length) {
-                Board[] tempsolutions = new Board[moves * 2];
-                for (int i = 0; i < moves; i++) {
-                    tempsolutions[i] = solutionBoards[i];
-                }
-                solutionBoards = tempsolutions;
-            }
-            solutionBoards[moves] = pq.delMin();
-            temp = solutionBoards[moves];
+
+            temp = pq.delMin();
+            solutionBoards.enqueue(temp);
+            if (moves > 1)
+                prev2prev[0] = prev2prev[1];
+            prev2prev[1] = temp;
 
             // Parallel operations to check solveabality
-            MinPQ<Board> tpq = new MinPQ<>(HAMMING_COMPARATOR);
+            MinPQ<Board> tpq = new MinPQ<>(MANHATTAN_COMPARATOR);
             for (Board titerBoard : ttemp.neighbors()) {
                 if (moves > 1 && !titerBoard.equals(tsolutionsBoard[0])) {
                     tpq.insert(titerBoard);
@@ -88,35 +88,14 @@ public class Solver {
     }
 
     public int moves() {
-        return moves;
+        return moves - 1;
     }
 
     public Iterable<Board> solution() {
-        class MySolverIterable implements Iterable<Board> {
-            public Iterator<Board> iterator() {
-                return new MySolverIter();
-            }
-
-            class MySolverIter implements Iterator<Board> {
-                private int iterelements = 0;
-
-                public boolean hasNext() {
-                    return (iterelements != moves);
-                }
-
-                public Board next() {
-                    return solutionBoards[iterelements++];
-                }
-
-                public void remove() {
-                    throw new UnsupportedOperationException("This method is not supported");
-                }
-            }
-        }
-        return new MySolverIterable();
+        return solutionBoards;
     }
 
     public static void main(String[] args) {
-
+        // Intentionally left empty
     }
 }

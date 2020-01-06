@@ -4,7 +4,7 @@
  *  Description:
  **************************************************************************** */
 
-import java.util.Iterator;
+import edu.princeton.cs.algs4.Stack;
 
 public class Board {
     private final int[][] tiles;
@@ -94,71 +94,40 @@ public class Board {
         return false;
     }
 
-
     public Iterable<Board> neighbors() {
-
-        class MyBoardIterable implements Iterable<Board> {
-
-            class MyBoardIter implements Iterator<Board> {
-                private int remainingNeigh = 0;
-                private Board[] boards;
-
-                public MyBoardIter() {
-                    int x = emptySlot % size;
-                    int y = emptySlot / size;
-                    boards = new Board[4];
-                    int[][] tempTiles = tiles;
-                    if (x - 1 != -1) {
-                        tempTiles[y][x] = tempTiles[y][x - 1];
-                        tempTiles[y][x - 1] = 0;
-                        boards[remainingNeigh++] = new Board(tempTiles);
-                        tempTiles[y][x - 1] = tempTiles[y][x];
-                        tempTiles[y][x] = 0;
-                    }
-                    if (y - 1 != -1) {
-                        tempTiles[y][x] = tempTiles[y - 1][x];
-                        tempTiles[y - 1][x] = 0;
-                        boards[remainingNeigh++] = new Board(tempTiles);
-                        tempTiles[y - 1][x] = tempTiles[y][x];
-                        tempTiles[y][x] = 0;
-                    }
-                    if (x + 1 != size) {
-                        tempTiles[y][x] = tempTiles[y][x + 1];
-                        tempTiles[y][x + 1] = 0;
-                        boards[remainingNeigh++] = new Board(tempTiles);
-                        tempTiles[y][x + 1] = tempTiles[y][x];
-                        tempTiles[y][x] = 0;
-                    }
-                    if (y + 1 != size) {
-                        tempTiles[y][x] = tempTiles[y + 1][x];
-                        tempTiles[y + 1][x] = 0;
-                        boards[remainingNeigh++] = new Board(tempTiles);
-                        tempTiles[y + 1][x] = tempTiles[y][x];
-                        tempTiles[y][x] = 0;
-                    }
-                }
-
-                public boolean hasNext() {
-                    if (remainingNeigh == 0) {
-                        return false;
-                    }
-                    return true;
-                }
-
-                public Board next() {
-                    return boards[--remainingNeigh];
-                }
-
-                public void remove() {
-                    throw new UnsupportedOperationException("This method is not supported");
-                }
-            }
-
-            public Iterator<Board> iterator() {
-                return new MyBoardIter();
-            }
+        Stack<Board> boards = new Stack<>();
+        int x = emptySlot % size;
+        int y = emptySlot / size;
+        int[][] tempTiles = tiles;
+        if (x - 1 != -1) {
+            tempTiles[y][x] = tempTiles[y][x - 1];
+            tempTiles[y][x - 1] = 0;
+            boards.push(new Board(tempTiles));
+            tempTiles[y][x - 1] = tempTiles[y][x];
+            tempTiles[y][x] = 0;
         }
-        return new MyBoardIterable();
+        if (y - 1 != -1) {
+            tempTiles[y][x] = tempTiles[y - 1][x];
+            tempTiles[y - 1][x] = 0;
+            boards.push(new Board(tempTiles));
+            tempTiles[y - 1][x] = tempTiles[y][x];
+            tempTiles[y][x] = 0;
+        }
+        if (x + 1 != size) {
+            tempTiles[y][x] = tempTiles[y][x + 1];
+            tempTiles[y][x + 1] = 0;
+            boards.push(new Board(tempTiles));
+            tempTiles[y][x + 1] = tempTiles[y][x];
+            tempTiles[y][x] = 0;
+        }
+        if (y + 1 != size) {
+            tempTiles[y][x] = tempTiles[y + 1][x];
+            tempTiles[y + 1][x] = 0;
+            boards.push(new Board(tempTiles));
+            tempTiles[y + 1][x] = tempTiles[y][x];
+            tempTiles[y][x] = 0;
+        }
+        return boards;
     }
 
     private void swap(int[][] arr, int x1, int y1, int x2, int y2) {
@@ -166,6 +135,7 @@ public class Board {
         arr[x1][y1] = arr[x2][y2];
         arr[x2][y2] = tmpval;
     }
+
     // This is used to see if the board is solvable
     public Board twin() {
         int[][] tempTiles = tiles.clone();
@@ -190,6 +160,6 @@ public class Board {
 
 
     public static void main(String[] args) {
-
+        // Intentionally left empty
     }
 }
