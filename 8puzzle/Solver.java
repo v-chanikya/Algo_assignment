@@ -31,7 +31,7 @@ public class Solver {
             this.prev = prev;
             this.board = board;
             this.gn = gn;
-            this.hn = board.hamming();
+            this.hn = board.manhattan();
         }
     }
 
@@ -39,26 +39,23 @@ public class Solver {
         if (initial == null) {
             throw new IllegalArgumentException("Initial board is illegl");
         }
-        int moves = 1;
 
         // Variables for actual initial board
         BoardFN temp = new BoardFN(null, initial, 0);
-        Board[] prev2prev = { initial, null };
         MinPQ<BoardFN> pq = new MinPQ<>(COMPARATOR);
         pq.insert(temp);
 
         // parallel instance vars init
         BoardFN ttemp = new BoardFN(null, initial.twin(), 0);
-        Board[] tsolutionsBoard = { ttemp.board, null };
         MinPQ<BoardFN> tpq = new MinPQ<>(COMPARATOR);
         tpq.insert(ttemp);
+
         while (!temp.board.isGoal() && !ttemp.board.isGoal()) {
-            // while (!temp.board.isGoal()) {
             // Actual solution code
             temp = pq.delMin();
 
             for (Board iterBoard : temp.board.neighbors()) {
-                if ((moves == 1) || (moves > 1 && !iterBoard.equals(prev2prev[0]))) {
+                if (temp.prev == null || !iterBoard.equals(temp.prev.board)) {
                     // The below code checks if the entry board is already present but
                     // it takes constant time which is worst for this problem
                     // Iterator<BoardFN> iter = pq.iterator();
@@ -74,23 +71,15 @@ public class Solver {
                     pq.insert(boardtemp);
                 }
             }
-            if (moves > 1)
-                prev2prev[0] = prev2prev[1];
-            prev2prev[1] = temp.board;
 
             // Parallel operations to check solveabality
             ttemp = tpq.delMin();
             for (Board titerBoard : ttemp.board.neighbors()) {
-                if ((moves == 1) || (moves > 1 && !titerBoard.equals(tsolutionsBoard[0]))) {
+                if (temp.prev == null || !titerBoard.equals(ttemp.prev.board)) {
                     BoardFN boardtemp = new BoardFN(ttemp, titerBoard, ttemp.gn + 1);
                     tpq.insert(boardtemp);
                 }
             }
-            if (moves > 1)
-                tsolutionsBoard[0] = tsolutionsBoard[1];
-            tsolutionsBoard[1] = ttemp.board;
-
-            moves++;
         }
 
         if (temp.board.isGoal()) {
@@ -108,8 +97,6 @@ public class Solver {
             solutionBoards = null;
             solvable = false;
         }
-
-        System.out.println("total no of iterations = " + moves);
 
     }
 
