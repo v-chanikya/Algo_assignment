@@ -12,6 +12,7 @@ public class Board {
     private final int hammingDist;
     private final int manhattanDist;
     private int emptySlot;
+    private final Stack<Board> boards = new Stack<>();
 
     public Board(int[][] tiles) {
         if (tiles == null) {
@@ -95,37 +96,38 @@ public class Board {
     }
 
     public Iterable<Board> neighbors() {
-        Stack<Board> boards = new Stack<>();
-        int x = emptySlot % size;
-        int y = emptySlot / size;
-        int[][] tempTiles = tiles;
-        if (x - 1 != -1) {
-            tempTiles[y][x] = tempTiles[y][x - 1];
-            tempTiles[y][x - 1] = 0;
-            boards.push(new Board(tempTiles));
-            tempTiles[y][x - 1] = tempTiles[y][x];
-            tempTiles[y][x] = 0;
-        }
-        if (y - 1 != -1) {
-            tempTiles[y][x] = tempTiles[y - 1][x];
-            tempTiles[y - 1][x] = 0;
-            boards.push(new Board(tempTiles));
-            tempTiles[y - 1][x] = tempTiles[y][x];
-            tempTiles[y][x] = 0;
-        }
-        if (x + 1 != size) {
-            tempTiles[y][x] = tempTiles[y][x + 1];
-            tempTiles[y][x + 1] = 0;
-            boards.push(new Board(tempTiles));
-            tempTiles[y][x + 1] = tempTiles[y][x];
-            tempTiles[y][x] = 0;
-        }
-        if (y + 1 != size) {
-            tempTiles[y][x] = tempTiles[y + 1][x];
-            tempTiles[y + 1][x] = 0;
-            boards.push(new Board(tempTiles));
-            tempTiles[y + 1][x] = tempTiles[y][x];
-            tempTiles[y][x] = 0;
+        if (boards.isEmpty()) {
+            int x = emptySlot % size;
+            int y = emptySlot / size;
+            int[][] tempTiles = tiles;
+            if (x - 1 != -1) {
+                tempTiles[y][x] = tempTiles[y][x - 1];
+                tempTiles[y][x - 1] = 0;
+                boards.push(new Board(tempTiles));
+                tempTiles[y][x - 1] = tempTiles[y][x];
+                tempTiles[y][x] = 0;
+            }
+            if (y - 1 != -1) {
+                tempTiles[y][x] = tempTiles[y - 1][x];
+                tempTiles[y - 1][x] = 0;
+                boards.push(new Board(tempTiles));
+                tempTiles[y - 1][x] = tempTiles[y][x];
+                tempTiles[y][x] = 0;
+            }
+            if (x + 1 != size) {
+                tempTiles[y][x] = tempTiles[y][x + 1];
+                tempTiles[y][x + 1] = 0;
+                boards.push(new Board(tempTiles));
+                tempTiles[y][x + 1] = tempTiles[y][x];
+                tempTiles[y][x] = 0;
+            }
+            if (y + 1 != size) {
+                tempTiles[y][x] = tempTiles[y + 1][x];
+                tempTiles[y + 1][x] = 0;
+                boards.push(new Board(tempTiles));
+                tempTiles[y + 1][x] = tempTiles[y][x];
+                tempTiles[y][x] = 0;
+            }
         }
         return boards;
     }

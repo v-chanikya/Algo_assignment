@@ -5,26 +5,33 @@
  **************************************************************************** */
 
 import edu.princeton.cs.algs4.MinPQ;
-import edu.princeton.cs.algs4.Queue;
+import edu.princeton.cs.algs4.Stack;
 
 import java.util.Comparator;
 
 public class Solver {
-    // private static final HammingCompareBoards HAMMING_COMPARATOR = new HammingCompareBoards();
-    private static final ManhattanCompareBoards MANHATTAN_COMPARATOR = new ManhattanCompareBoards();
+    private static final CompareBoards COMPARATOR = new CompareBoards();
     private final boolean solvable;
-    private final Queue<Board> solutionBoards = new Queue<>();
-    private int moves = 0;
+    private final Stack<Board> solutionBoards;
+    private final int fmoves;
 
-    // private static class HammingCompareBoards implements Comparator<Board> {
-    //     public int compare(Board o1, Board o2) {
-    //         return o1.hamming() - o2.hamming();
-    //     }
-    // }
+    private static class CompareBoards implements Comparator<BoardFN> {
+        public int compare(BoardFN o1, BoardFN o2) {
+            return (o1.hn + o1.gn) - (o2.hn + o2.gn);
+        }
+    }
 
-    private static class ManhattanCompareBoards implements Comparator<Board> {
-        public int compare(Board o1, Board o2) {
-            return o1.manhattan() - o2.manhattan();
+    private class BoardFN {
+        private final BoardFN prev;
+        private final Board board;
+        private final int gn;
+        private final int hn;
+
+        public BoardFN(BoardFN prev, Board board, int gn) {
+            this.prev = prev;
+            this.board = board;
+            this.gn = gn;
+            this.hn = board.hamming();
         }
     }
 
@@ -32,55 +39,78 @@ public class Solver {
         if (initial == null) {
             throw new IllegalArgumentException("Initial board is illegl");
         }
-        Board temp = initial;
-        Board[] prev2prev = new Board[2];
-        prev2prev[0] = initial;
-        solutionBoards.enqueue(temp);
-        moves++;
+        int moves = 1;
 
-        Board ttemp = initial.twin();
-        Board[] tsolutionsBoard = new Board[2];
-        tsolutionsBoard[0] = ttemp;
-        while (!temp.isGoal() && !ttemp.isGoal()) {
+        // Variables for actual initial board
+        BoardFN temp = new BoardFN(null, initial, 0);
+        Board[] prev2prev = { initial, null };
+        MinPQ<BoardFN> pq = new MinPQ<>(COMPARATOR);
+        pq.insert(temp);
+
+        // parallel instance vars init
+        BoardFN ttemp = new BoardFN(null, initial.twin(), 0);
+        Board[] tsolutionsBoard = { ttemp.board, null };
+        MinPQ<BoardFN> tpq = new MinPQ<>(COMPARATOR);
+        tpq.insert(ttemp);
+        while (!temp.board.isGoal() && !ttemp.board.isGoal()) {
+            // while (!temp.board.isGoal()) {
             // Actual solution code
-            MinPQ<Board> pq = new MinPQ<>(MANHATTAN_COMPARATOR);
-            for (Board iterBoard : temp.neighbors()) {
-                if (moves > 1 && !iterBoard.equals(prev2prev[0])) {
-                    pq.insert(iterBoard);
-                }
-                else if (moves == 1) {
-                    pq.insert(iterBoard);
+            temp = pq.delMin();
+
+            for (Board iterBoard : temp.board.neighbors()) {
+                if ((moves == 1) || (moves > 1 && !iterBoard.equals(prev2prev[0]))) {
+                    // The below code checks if the entry board is already present but
+                    // it takes constant time which is worst for this problem
+                    // Iterator<BoardFN> iter = pq.iterator();
+                    // boolean hasElement = false;
+                    // while (iter.hasNext()) {
+                    //     if (iter.next().board.equals(iterBoard)) {
+                    //         hasElement = true;
+                    //     }
+                    // }
+                    // if (hasElement)
+                    //     continue;
+                    BoardFN boardtemp = new BoardFN(temp, iterBoard, temp.gn + 1);
+                    pq.insert(boardtemp);
                 }
             }
-
-            temp = pq.delMin();
-            solutionBoards.enqueue(temp);
             if (moves > 1)
                 prev2prev[0] = prev2prev[1];
-            prev2prev[1] = temp;
+            prev2prev[1] = temp.board;
 
             // Parallel operations to check solveabality
-            MinPQ<Board> tpq = new MinPQ<>(MANHATTAN_COMPARATOR);
-            for (Board titerBoard : ttemp.neighbors()) {
-                if (moves > 1 && !titerBoard.equals(tsolutionsBoard[0])) {
-                    tpq.insert(titerBoard);
-                }
-                else if (moves == 1) {
-                    tpq.insert(titerBoard);
+            ttemp = tpq.delMin();
+            for (Board titerBoard : ttemp.board.neighbors()) {
+                if ((moves == 1) || (moves > 1 && !titerBoard.equals(tsolutionsBoard[0]))) {
+                    BoardFN boardtemp = new BoardFN(ttemp, titerBoard, ttemp.gn + 1);
+                    tpq.insert(boardtemp);
                 }
             }
-            ttemp = tpq.delMin();
             if (moves > 1)
                 tsolutionsBoard[0] = tsolutionsBoard[1];
-            tsolutionsBoard[1] = ttemp;
+            tsolutionsBoard[1] = ttemp.board;
+
             moves++;
         }
-        if (ttemp.isGoal()) {
-            solvable = false;
-        }
-        else {
+
+        if (temp.board.isGoal()) {
+            fmoves = temp.gn;
+            solutionBoards = new Stack<>();
+            while (temp.prev != null) {
+                solutionBoards.push(temp.board);
+                temp = temp.prev;
+            }
+            solutionBoards.push(temp.board);
             solvable = true;
         }
+        else {
+            fmoves = -1;
+            solutionBoards = null;
+            solvable = false;
+        }
+
+        System.out.println("total no of iterations = " + moves);
+
     }
 
     public boolean isSolvable() {
@@ -88,7 +118,7 @@ public class Solver {
     }
 
     public int moves() {
-        return moves - 1;
+        return fmoves;
     }
 
     public Iterable<Board> solution() {
